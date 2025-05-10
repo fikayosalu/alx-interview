@@ -29,7 +29,7 @@ The following concepts were applied in the development of this script:
 
 ### Each log line should have the following format:
 
-"<IP Address>" - [<date>] "GET /projects/260 HTTP/1.1" "<status code>" "<file size>"
+&lt;IP Address&gt; - [&lt;date&gt;] "GET /projects/260 HTTP/1.1" &lt;status code&gt; &lt;file size&gt;
 
 ## Example Output
 
