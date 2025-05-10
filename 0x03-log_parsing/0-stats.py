@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+""" Log parsing task module """
 import sys
 
 # Variable Initialization
