@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 """  0-lockboxes """
 
+
 def canUnlockAll(boxes):
     """
     Checks if all boxes can be opened starting from box 0.
