@@ -1,39 +1,48 @@
 #!/usr/bin/python3
-""" Log parsing task module """
+
 import sys
+import re
+from collections import defaultdict
 
-# Variable Initialization
-status_codes = {200: 0, 301: 0, 400: 0, 403: 0, 404: 0, 405: 0, 500: 0}
-size = 0
-count = 0
+# Allowed status codes
+VALID_STATUS_CODES = {'200', '301', '400', '401', '403', '404', '405', '500'}
+
+# Counters
+total_size = 0
+status_counts = defaultdict(int)
+line_count = 0
+
+# Regex pattern to validate and extract fields
+log_pattern = re.compile(
+    r'^(\S+) - \[(.*?)\] "GET /projects/260 HTTP/1.1" (\d{3}) (\d+)$'
+)
 
 
-def output():
-    # Create the syntax of the program output
-    print(f"File size: {size}")
-    for item, value in status_codes.items():
-        if value > 0:
-            print(f"{item}: {value}")
+def print_stats():
+    """Prints the collected metrics."""
+    print("File size: {}".format(total_size))
+    for code in sorted(VALID_STATUS_CODES):
+        if status_counts[code]:
+            print("{}: {}".format(code, status_counts[code]))
 
 
 try:
-    # Read the stdin line by line
     for line in sys.stdin:
-        result = line.split(" ")
+        match = log_pattern.match(line.strip())
+        if match:
+            ip, date, status, size = match.groups()
+            total_size += int(size)
+            if status in VALID_STATUS_CODES:
+                status_counts[status] += 1
 
-        try:
-            code = int(result[-2])  # Extract the status code
-            size += int(result[-1])  # Extract file size
-        except (TypeError, ValueError):
-            continue
+        line_count += 1
+        if line_count % 10 == 0:
+            print_stats()
 
-        if code in status_codes:
-            status_codes[code] += 1
-
-        count += 1
-        # Print output after 10 lines
-        if count % 10 == 0:
-            output()
-# Print output when Ctrl+c is pressed
 except KeyboardInterrupt:
-    output()
+    print_stats()
+    raise
+
+# Print stats one final time if not already printed due to 10-line mark
+if line_count % 10 != 0:
+    print_stats()
